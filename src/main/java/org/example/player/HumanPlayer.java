@@ -18,6 +18,7 @@ public class HumanPlayer extends Player {
 
     @Override
     public Suit selectTramp() {
+        System.out.println("IMPLEMENTE ETTT");
         return null;
     }
 
