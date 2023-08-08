@@ -104,7 +104,7 @@ public class GameManager {
     }
 
     public void oneGameCycle() {
-
+        System.out.println("adadawsda");
     }
 
 }
