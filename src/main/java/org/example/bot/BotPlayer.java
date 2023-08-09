@@ -24,10 +24,11 @@ public class BotPlayer extends Player {
             System.out.println((i + 1) + "-) " + this.getHand().get(i));
         }
     }
-
     @Override
     public Card playCard() {
-        return null;
+        Card selectedCard = getHand().get(0);
+        getHand().remove(selectedCard);
+        return selectedCard;
     }
 
     @Override
@@ -38,7 +39,7 @@ public class BotPlayer extends Player {
     @Override
     public int makeBid() {
         // todo: cannot bid equal or less than currentbid if there's any
-        return determineBid().orElse(4);
+        return determineBid().orElse(8);
     }
 
     private Optional<Integer> determineBid() {

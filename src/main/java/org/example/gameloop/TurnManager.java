@@ -20,26 +20,34 @@ public class TurnManager {
 
     public Player getCurrentPlayer() {
         return this.getPlayerTurns()
-                .stream().filter(Player::isFirst)
+                .stream().filter(Player::isFirstToPlay)
                 .findAny()
                 .orElseThrow(() -> new RuntimeException("There is no current player"));
     }
 
-    public void nextTurn() {
+    public void nextTurnForBid() {
         if (!iterator.hasNext()) {
             iterator = playerTurns.iterator();
         }
         for (Player playerTurn : playerTurns) {
-            playerTurn.setFirst(false);
+            playerTurn.setFirstToBid(false);
         }
-        iterator.next().setFirst(true);
+        iterator.next().setFirstToBid(true);
+    }
+
+
+    public void nextTurnForGame() {
+        if (!iterator.hasNext()) {
+            iterator = playerTurns.iterator();
+        }
+        for (Player playerTurn : playerTurns) {
+            playerTurn.setFirstToPlay(false);
+        }
+        iterator.next().setFirstToPlay(true);
     }
 
     public Player setFirstPlayer(Player player) {
-        for (Player playerTurn : playerTurns) {
-            playerTurn.setFirst(false);
-        }
-        player.setFirst(true);
+        player.setFirstToPlay(true);
         return player;
     }
 }

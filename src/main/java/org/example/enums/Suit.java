@@ -20,6 +20,10 @@ public enum Suit {
         return this.suitCode;
     }
 
+    public String getSuitName() {
+        return suitName;
+    }
+
     @Override
     public String toString() {
         return this.suitName;

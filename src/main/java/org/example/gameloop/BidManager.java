@@ -28,20 +28,19 @@ public class BidManager {
 
     public Player determineTheBidWinner() {
         Map<Player, Integer> bidByPlayer = new HashMap<>();
-        for (int i = 0; i < 4; i++) {
-            //todo: use the flag.
-            if (humanPlayer.isFirst()) {
+        for (int i = 0; i < 9; i++) {
+            if (humanPlayer.isFirstToBid()) {
                 bidByPlayer.put(humanPlayer, humanPlayer.makeBid());
-                turnManager.nextTurn();
-            } else if (bot1.isFirst()) {
+                turnManager.nextTurnForBid();
+            } else if (bot1.isFirstToBid()) {
                 bidByPlayer.put(bot1, bot1.makeBid());
-                turnManager.nextTurn();
-            } else if (bot2.isFirst()) {
+                turnManager.nextTurnForBid();
+            } else if (bot2.isFirstToBid()) {
                 bidByPlayer.put(bot2, bot2.makeBid());
-                turnManager.nextTurn();
-            } else if (bot3.isFirst()) {
+                turnManager.nextTurnForBid();
+            } else if (bot3.isFirstToBid()) {
                 bidByPlayer.put(bot3, bot3.makeBid());
-                turnManager.nextTurn();
+                turnManager.nextTurnForBid();
             }
         }
         Map.Entry<Player, Integer> playerWhoBidMax = bidByPlayer.entrySet().stream().max(Map.Entry.comparingByValue())

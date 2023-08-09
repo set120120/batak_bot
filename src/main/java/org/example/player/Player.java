@@ -3,23 +3,39 @@ package org.example.player;
 import org.example.enums.Suit;
 import org.example.gameloop.Card;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public abstract class Player {
 
-    private boolean isFirst;
+    private boolean isFirstToBid;
+
+    private boolean isFirstToPlay;
     // todo: isFirstToBid isFirstToPlay olarak ayıralım
     protected String name;
     protected List<Card> hand;
     protected int scoreInCurrentRound;
 
     public Player() {
-        this.isFirst = false;
+        this.isFirstToBid = false;
+        this.isFirstToPlay = false;
         this.hand = new LinkedList<>();
         this.scoreInCurrentRound = 0;
     }
 
+    public List<Card> groupCardsInHand() {
+        Map<String, List<Card>> groupedAndSorted = this.getHand().stream()
+                .collect(Collectors.groupingBy(card -> card.getSuit().getSuitName(),
+                        Collectors.collectingAndThen(
+                                Collectors.toList(),
+                                cards -> cards.stream()
+                                        .sorted(Comparator.comparingInt(card -> card.getValue().getValueCode()))
+                                        .collect(Collectors.toList()))));
+
+        List<Card> result = new ArrayList<>();  // Create a modifiable list
+        groupedAndSorted.values().forEach(result::addAll);  // Add the sorted cards to the result list
+        return result;
+    }
     public boolean isHandEmpty() {
         return hand.isEmpty();
     }
@@ -32,12 +48,20 @@ public abstract class Player {
         return name;
     }
 
-    public boolean isFirst() {
-        return isFirst;
+    public boolean isFirstToBid() {
+        return isFirstToBid;
     }
 
-    public void setFirst(boolean first) {
-        isFirst = first;
+    public boolean isFirstToPlay() {
+        return isFirstToPlay;
+    }
+
+    public void setFirstToPlay(boolean firstToPlay) {
+        this.isFirstToPlay = firstToPlay;
+    }
+
+    public void setFirstToBid(boolean isFirstToBid) {
+        this.isFirstToBid = isFirstToBid;
     }
 
     public void setName(String name) {
@@ -71,5 +95,9 @@ public abstract class Player {
                 "hand=" + hand +
                 ", scoreInCurrentRound=" + scoreInCurrentRound +
                 '}';
+    }
+
+    public void setHand(List<Card> groupCardsInHand) {
+        this.hand = groupCardsInHand;
     }
 }

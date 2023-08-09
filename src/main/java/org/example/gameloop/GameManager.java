@@ -12,6 +12,7 @@ public class GameManager {
     private final BotPlayer bot1;
     private final BotPlayer bot2;
     private final BotPlayer bot3;
+    private Player player;
     private final Table table;
     private final Dealer dealer;
     private final Scoreboard scoreboard;
@@ -36,12 +37,19 @@ public class GameManager {
     public void start() {
         chooseFirstPlayerToBid(scanner);
         dealer.dealCardsToPlayer(humanPlayer, bot1, bot2, bot3);
-        Player player = bidManager.determineTheBidWinner();
+        player = bidManager.determineTheBidWinner();
+//        humanPlayer.logHand();
+//        bot1.logHand();
+//        bot2.logHand();
+//        bot3.logHand();
+        Suit gameTramp = bidManager.selectGameTramp(player);
+        oneGameCycle();
         humanPlayer.logHand();
         bot1.logHand();
         bot2.logHand();
         bot3.logHand();
-        Suit gameTramp = bidManager.selectGameTramp(player);
+        player.logHand();
+       // Suit gameTramp = player.selectTramp();
     }
 
     private void chooseFirstPlayerToBid(Scanner scanner) {
@@ -53,19 +61,19 @@ public class GameManager {
         }
         switch (input) {
             case "1" -> {
-                humanPlayer.setFirst(true);
+                humanPlayer.setFirstToBid(true);
                 System.out.println("Human player goes first to bid.");
             }
             case "2" -> {
-                bot1.setFirst(true);
+                bot1.setFirstToBid(true);
                 System.out.println("Bot1 player goes first to bid.");
             }
             case "3" -> {
-                bot2.setFirst(true);
+                bot2.setFirstToBid(true);
                 System.out.println("Bot2 goes bid first to bid.");
             }
             default -> {
-                bot3.setFirst(true);
+                bot3.setFirstToBid(true);
                 System.out.println("Bot3 goes bid first to bid");
             }
         }
@@ -76,7 +84,7 @@ public class GameManager {
         table.displayCurrentTable();
 
         Card playedCard = humanPlayer.playCard();
-        turnManager.nextTurn();
+        turnManager.nextTurnForGame();
     }
 
     private void playTurnBot(BotPlayer bot) {
@@ -84,10 +92,15 @@ public class GameManager {
         table.displayCurrentTable();
 
         Card playedCard = bot.playCard();
-        turnManager.nextTurn();
+        turnManager.nextTurnForGame();
     }
 
     public void oneGameCycle() {
+        for (int i = 0; i<4; i++){
+            player.playCard();
+           // player.logHand();
+            turnManager.nextTurnForGame();
+        }
         System.out.println("adadawsda");
     }
 
