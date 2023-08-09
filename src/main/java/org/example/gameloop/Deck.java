@@ -13,7 +13,7 @@ public class Deck {
 
     private final LinkedList<Card> cards = new LinkedList<>();
 
-    Deck() {
+    public Deck() {
         for (Suit suit : Suit.values()) {
             for (Value value : Value.values()) {
                 cards.add(new Card(suit, value));

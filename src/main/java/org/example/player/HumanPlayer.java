@@ -23,6 +23,7 @@ public class HumanPlayer extends Player {
     }
 
     @Override
+    // todo: do group by and order
     public void logHand() {
         System.out.println("Your hand: ");
         for (int i = 0; i < this.getHand().size(); i++) {
@@ -43,8 +44,6 @@ public class HumanPlayer extends Player {
 
     @Override
     public String toString() {
-        return "HumanPlayer{" + '\'' +
-                ", hand=" + hand +
-                '}';
+        return "HumanPlayer{hand=" + hand + "}";
     }
 }

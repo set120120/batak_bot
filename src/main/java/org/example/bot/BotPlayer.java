@@ -37,6 +37,7 @@ public class BotPlayer extends Player {
 
     @Override
     public int makeBid() {
+        // todo: cannot bid equal or less than currentbid if there's any
         return determineBid().orElse(4);
     }
 

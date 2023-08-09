@@ -3,14 +3,22 @@ package org.example.player;
 import org.example.enums.Suit;
 import org.example.gameloop.Card;
 
+import java.util.LinkedList;
 import java.util.List;
 
 public abstract class Player {
 
     private boolean isFirst;
+    // todo: isFirstToBid isFirstToPlay olarak ayıralım
     protected String name;
     protected List<Card> hand;
-    private int scoreInCurrentRound;
+    protected int scoreInCurrentRound;
+
+    public Player() {
+        this.isFirst = false;
+        this.hand = new LinkedList<>();
+        this.scoreInCurrentRound = 0;
+    }
 
     public boolean isHandEmpty() {
         return hand.isEmpty();
@@ -22,6 +30,14 @@ public abstract class Player {
 
     public String getName() {
         return name;
+    }
+
+    public boolean isFirst() {
+        return isFirst;
+    }
+
+    public void setFirst(boolean first) {
+        isFirst = first;
     }
 
     public void setName(String name) {
@@ -39,7 +55,9 @@ public abstract class Player {
     public void setScore(int scoreInCurrentRound) {
         this.scoreInCurrentRound = scoreInCurrentRound;
     }
+
     public abstract Suit selectTramp();
+
     public abstract void logHand();
 
     public abstract Card playCard();

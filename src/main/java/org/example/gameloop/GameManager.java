@@ -8,7 +8,6 @@ import org.example.player.Player;
 import java.util.Scanner;
 
 public class GameManager {
-
     private final HumanPlayer humanPlayer;
     private final BotPlayer bot1;
     private final BotPlayer bot2;
@@ -17,12 +16,8 @@ public class GameManager {
     private final Dealer dealer;
     private final Scoreboard scoreboard;
     private final Scanner scanner;
-    private Player firstPlayerToBid;
-    private TurnManager turnManager;
-    private Player firstPlayerToStart;
-    private Player currentPlayer;
-    private BidManager bidManager;
-    private Suit currentTramp;
+    private final TurnManager turnManager;
+    private final BidManager bidManager;
 
     public GameManager(HumanPlayer humanPlayer, BotPlayer bot1, BotPlayer bot2, BotPlayer bot3, Dealer dealer,
                        Table table, Scoreboard scoreboard, Scanner scanner, TurnManager turnManager, BidManager bidManager) {
@@ -40,8 +35,13 @@ public class GameManager {
 
     public void start() {
         chooseFirstPlayerToBid(scanner);
-        firstPlayerToStart = bidManager.selectPlayerToStart(humanPlayer, bot1, bot2, bot3, firstPlayerToBid);
-        currentTramp = bidManager.selectGameTramp(firstPlayerToStart);
+        dealer.dealCardsToPlayer(humanPlayer, bot1, bot2, bot3);
+        Player player = bidManager.determineTheBidWinner();
+        humanPlayer.logHand();
+        bot1.logHand();
+        bot2.logHand();
+        bot3.logHand();
+        Suit gameTramp = bidManager.selectGameTramp(player);
     }
 
     private void chooseFirstPlayerToBid(Scanner scanner) {
@@ -53,19 +53,19 @@ public class GameManager {
         }
         switch (input) {
             case "1" -> {
-                firstPlayerToBid = humanPlayer;
+                humanPlayer.setFirst(true);
                 System.out.println("Human player goes first to bid.");
             }
             case "2" -> {
-                firstPlayerToBid = bot1;
+                bot1.setFirst(true);
                 System.out.println("Bot1 player goes first to bid.");
             }
             case "3" -> {
-                firstPlayerToBid = bot2;
+                bot2.setFirst(true);
                 System.out.println("Bot2 goes bid first to bid.");
             }
             default -> {
-                firstPlayerToBid = bot3;
+                bot3.setFirst(true);
                 System.out.println("Bot3 goes bid first to bid");
             }
         }
@@ -76,31 +76,15 @@ public class GameManager {
         table.displayCurrentTable();
 
         Card playedCard = humanPlayer.playCard();
-        currentPlayer = turnManager.nextTurn();
+        turnManager.nextTurn();
     }
 
-    private void playTurnBot1() {
-        System.out.println("*********************Bot1 Player Turn*****************");
+    private void playTurnBot(BotPlayer bot) {
+        System.out.println("*********************" + bot.getName() + " Turn*****************");
         table.displayCurrentTable();
 
-        Card playedCard = bot1.playCard();
-        currentPlayer = turnManager.nextTurn();
-    }
-
-    private void playTurnBot2() {
-        System.out.println("*********************Bot2 Player Turn*****************");
-        table.displayCurrentTable();
-
-        Card playedCard = bot1.playCard();
-        currentPlayer = turnManager.nextTurn();
-    }
-
-    private void playTurnBot3() {
-        System.out.println("*********************Bot3 Player Turn*****************");
-        table.displayCurrentTable();
-
-        Card playedCard = bot1.playCard();
-        currentPlayer = turnManager.nextTurn();
+        Card playedCard = bot.playCard();
+        turnManager.nextTurn();
     }
 
     public void oneGameCycle() {
