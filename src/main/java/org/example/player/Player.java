@@ -8,13 +8,22 @@ import java.util.stream.Collectors;
 
 public abstract class Player {
 
+    private Player next;
     private boolean isFirstToBid;
 
     private boolean isFirstToPlay;
     // todo: isFirstToBid isFirstToPlay olarak ayıralım
     protected String name;
     protected List<Card> hand;
-    protected int scoreInCurrentRound;
+    protected int scoreInCurrentRound = 0;
+
+    public Player getNext() {
+        return next;
+    }
+
+    public void setNext(Player next) {
+        this.next = next;
+    }
 
     public Player() {
         this.isFirstToBid = false;
@@ -29,7 +38,7 @@ public abstract class Player {
                         Collectors.collectingAndThen(
                                 Collectors.toList(),
                                 cards -> cards.stream()
-                                        .sorted(Comparator.comparingInt(card -> card.getValue().getValueCode()))
+                                        .sorted(Comparator.comparingInt(card -> -card.getValue().getValueCode()))  // Ters sıralama
                                         .collect(Collectors.toList()))));
 
         List<Card> result = new ArrayList<>();  // Create a modifiable list
@@ -48,17 +57,6 @@ public abstract class Player {
         return name;
     }
 
-    public boolean isFirstToBid() {
-        return isFirstToBid;
-    }
-
-    public boolean isFirstToPlay() {
-        return isFirstToPlay;
-    }
-
-    public void setFirstToPlay(boolean firstToPlay) {
-        this.isFirstToPlay = firstToPlay;
-    }
 
     public void setFirstToBid(boolean isFirstToBid) {
         this.isFirstToBid = isFirstToBid;

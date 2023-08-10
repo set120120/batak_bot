@@ -16,7 +16,6 @@ public class BotPlayer extends Player {
         this.name = name;
     }
 
-
     @Override
     public void logHand() {
         System.out.println(this.getName() + "'s hand: ");
@@ -28,6 +27,7 @@ public class BotPlayer extends Player {
     public Card playCard() {
         Card selectedCard = getHand().get(0);
         getHand().remove(selectedCard);
+        //logHand();
         return selectedCard;
     }
 
@@ -39,7 +39,7 @@ public class BotPlayer extends Player {
     @Override
     public int makeBid() {
         // todo: cannot bid equal or less than currentbid if there's any
-        return determineBid().orElse(8);
+        return determineBid().orElse(4);
     }
 
     private Optional<Integer> determineBid() {
@@ -93,7 +93,6 @@ public class BotPlayer extends Player {
                 ", hand=" + hand +
                 '}';
     }
-
 
     @Override
     public boolean equals(Object o) {

@@ -5,6 +5,8 @@ import org.example.enums.Suit;
 import org.example.player.HumanPlayer;
 import org.example.player.Player;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 
 public class GameManager {
@@ -18,10 +20,14 @@ public class GameManager {
     private final Scoreboard scoreboard;
     private final Scanner scanner;
     private final TurnManager turnManager;
+    private final TurnCycleEvaluator turnCycleEvaluator;
     private final BidManager bidManager;
+    private Map<Player, Card> cardsPlayedCycle = new HashMap<>();
+    private Suit gameTramp;
+    private Suit firstCardsSuit;
 
     public GameManager(HumanPlayer humanPlayer, BotPlayer bot1, BotPlayer bot2, BotPlayer bot3, Dealer dealer,
-                       Table table, Scoreboard scoreboard, Scanner scanner, TurnManager turnManager, BidManager bidManager) {
+                       Table table, Scoreboard scoreboard, Scanner scanner, TurnManager turnManager, TurnCycleEvaluator turnCycleEvaluator, BidManager bidManager) {
         this.humanPlayer = humanPlayer;
         this.bot1 = bot1;
         this.bot2 = bot2;
@@ -31,28 +37,24 @@ public class GameManager {
         this.scoreboard = scoreboard;
         this.scanner = scanner;
         this.turnManager = turnManager;
+        this.turnCycleEvaluator = turnCycleEvaluator;
         this.bidManager = bidManager;
     }
 
     public void start() {
-        chooseFirstPlayerToBid(scanner);
+        Player firstPlayerToBid = chooseFirstPlayerToBid(scanner);
         dealer.dealCardsToPlayer(humanPlayer, bot1, bot2, bot3);
-        player = bidManager.determineTheBidWinner();
-//        humanPlayer.logHand();
-//        bot1.logHand();
-//        bot2.logHand();
-//        bot3.logHand();
-        Suit gameTramp = bidManager.selectGameTramp(player);
-        oneGameCycle();
-        humanPlayer.logHand();
-        bot1.logHand();
-        bot2.logHand();
-        bot3.logHand();
-        player.logHand();
-       // Suit gameTramp = player.selectTramp();
+        player = bidManager.determineTheBidWinner(firstPlayerToBid);
+        gameTramp = player.selectTramp();
+        for (int i = 0; i < 13; i++) {
+            oneGameCycle();
+            player = turnCycleEvaluator.findMostValuableCardsOwner(cardsPlayedCycle, gameTramp, firstCardsSuit);
+            cardsPlayedCycle.clear();
+        }
+        System.out.println("game finished");
     }
 
-    private void chooseFirstPlayerToBid(Scanner scanner) {
+    private Player chooseFirstPlayerToBid(Scanner scanner) {
         System.out.println("Who should go first? Enter '1' for Human or '2' for Bot1. '3' Bot2. '4' for Bot3.");
         String input = scanner.nextLine();
         while (!input.equals("1") && !input.equals("2") && !input.equals("3") && !input.equals("4")) {
@@ -63,45 +65,41 @@ public class GameManager {
             case "1" -> {
                 humanPlayer.setFirstToBid(true);
                 System.out.println("Human player goes first to bid.");
+                return humanPlayer;
             }
             case "2" -> {
                 bot1.setFirstToBid(true);
                 System.out.println("Bot1 player goes first to bid.");
+                return bot1;
             }
             case "3" -> {
                 bot2.setFirstToBid(true);
                 System.out.println("Bot2 goes bid first to bid.");
+                return bot2;
             }
             default -> {
                 bot3.setFirstToBid(true);
                 System.out.println("Bot3 goes bid first to bid");
+                return bot3;
             }
         }
     }
 
-    private void playTurnHuman() {
-        System.out.println("*********************Human Player Turn*****************");
-        table.displayCurrentTable();
-
-        Card playedCard = humanPlayer.playCard();
-        turnManager.nextTurnForGame();
-    }
-
-    private void playTurnBot(BotPlayer bot) {
-        System.out.println("*********************" + bot.getName() + " Turn*****************");
-        table.displayCurrentTable();
-
-        Card playedCard = bot.playCard();
-        turnManager.nextTurnForGame();
-    }
-
     public void oneGameCycle() {
-        for (int i = 0; i<4; i++){
-            player.playCard();
-           // player.logHand();
-            turnManager.nextTurnForGame();
-        }
-        System.out.println("adadawsda");
+        System.out.println(player.getName() + " is playing ");
+        Card selectedCard = player.playCard();
+        firstCardsSuit = selectedCard.getSuit();
+        cardsPlayedCycle.put(player, selectedCard);
+        selectedCard = player.getNext().playCard();
+        System.out.println(player.getNext().getName() + " is playing ");
+        cardsPlayedCycle.put(player.getNext(), selectedCard);
+        selectedCard = player.getNext().getNext().playCard();
+        System.out.println(player.getNext().getNext().getName() + " is playing ");
+        cardsPlayedCycle.put(player.getNext().getNext(), selectedCard);
+        selectedCard = player.getNext().getNext().getNext().playCard();
+        cardsPlayedCycle.put(player.getNext().getNext().getNext(), selectedCard);
+        System.out.println(player.getNext().getNext().getNext().getName() + " is playing ");
+        System.out.println(cardsPlayedCycle.values());
+        System.out.println(player.getName());
     }
-
 }

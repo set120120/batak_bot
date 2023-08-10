@@ -4,7 +4,6 @@ import org.example.bot.BotPlayer;
 import org.example.gameloop.*;
 import org.example.player.HumanPlayer;
 
-import java.util.List;
 import java.util.Scanner;
 
 public class Main {
@@ -12,6 +11,7 @@ public class Main {
         GameManager gameManager = initializeGamePlay();
 
         gameManager.start();
+
 
     }
 
@@ -21,11 +21,16 @@ public class Main {
         BotPlayer bot1 = new BotPlayer("Bot1");
         BotPlayer bot2 = new BotPlayer("Bot2");
         BotPlayer bot3 = new BotPlayer("Bot3");
+        humanPlayer.setNext(bot1);
+        bot1.setNext(bot2);
+        bot2.setNext(bot3);
+        bot3.setNext(humanPlayer);
         Dealer dealer = new Dealer(new Deck());
         Table table = new Table();
         Scoreboard scoreboard = new Scoreboard(humanPlayer, bot1, bot2, bot3);
-        TurnManager turnManager = new TurnManager(List.of(humanPlayer, bot1, bot2, bot3));
-        BidManager bidManager = new BidManager(humanPlayer, bot1, bot2, bot3, turnManager);
-        return new GameManager(humanPlayer, bot1, bot2, bot3, dealer, table, scoreboard, scanner, turnManager, bidManager);
+        TurnCycleEvaluator turnCycleEvaluator = new TurnCycleEvaluator();
+        TurnManager turnManager = new TurnManager(turnCycleEvaluator);
+        BidManager bidManager = new BidManager();
+        return new GameManager(humanPlayer, bot1, bot2, bot3, dealer, table, scoreboard, scanner, turnManager, turnCycleEvaluator, bidManager);
     }
 }

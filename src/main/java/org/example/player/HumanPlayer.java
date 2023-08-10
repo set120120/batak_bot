@@ -16,7 +16,6 @@ public class HumanPlayer extends Player {
     }
 
 
-
     @Override
     public Suit selectTramp() {
         return null;
@@ -34,8 +33,8 @@ public class HumanPlayer extends Player {
     @Override
     public Card playCard() {
         Card selectedCard = getPlayerInput();
-        if (getHand().contains(selectedCard)){
-            System.out.println(getHand().remove(selectedCard));
+        if (getHand().contains(selectedCard)) {
+            getHand().remove(selectedCard);
             return selectedCard;
         } else {
             System.out.println("There is not selected card");
@@ -46,7 +45,9 @@ public class HumanPlayer extends Player {
 
     @Override
     public int makeBid() {
-       return 7;
+        System.out.println("Enter the number to make bid.");
+
+        return scanner.nextInt();
 
     }
 
@@ -56,7 +57,7 @@ public class HumanPlayer extends Player {
     }
 
     private Card getPlayerInput() {
-        logHand();
+        //logHand();
 
         System.out.println("Enter the number corresponding to the card you want to play:");
         int cardIndex = scanner.nextInt() - 1;

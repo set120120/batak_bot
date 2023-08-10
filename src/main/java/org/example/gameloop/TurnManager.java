@@ -2,52 +2,30 @@ package org.example.gameloop;
 
 import org.example.player.Player;
 
-import java.util.Iterator;
+import java.util.ArrayList;
 import java.util.List;
 
 public class TurnManager {
     private final List<Player> playerTurns;
-    private Iterator<Player> iterator;
+    private final TurnCycleEvaluator turnCycleEvaluator;
+
+    public TurnManager(TurnCycleEvaluator turnCycleEvaluator) {
+        this.turnCycleEvaluator = turnCycleEvaluator;
+        this.playerTurns = new ArrayList<>(4);
+    }
 
     public List<Player> getPlayerTurns() {
         return playerTurns;
     }
 
-    public TurnManager(List<Player> playerTurns) {
-        this.playerTurns = playerTurns;
-        this.iterator = playerTurns.iterator();
-    }
+    public List<Player> setNewTurnCycle(Player turnWinner) {
+        List<Player> newTurnList = new ArrayList<>();
 
-    public Player getCurrentPlayer() {
-        return this.getPlayerTurns()
-                .stream().filter(Player::isFirstToPlay)
-                .findAny()
-                .orElseThrow(() -> new RuntimeException("There is no current player"));
-    }
+        newTurnList.add(0, turnWinner);
+        newTurnList.add(1, turnWinner.getNext());
+        newTurnList.add(2, turnWinner.getNext().getNext());
+        newTurnList.add(3, turnWinner.getNext().getNext().getNext());
 
-    public void nextTurnForBid() {
-        if (!iterator.hasNext()) {
-            iterator = playerTurns.iterator();
-        }
-        for (Player playerTurn : playerTurns) {
-            playerTurn.setFirstToBid(false);
-        }
-        iterator.next().setFirstToBid(true);
-    }
-
-
-    public void nextTurnForGame() {
-        if (!iterator.hasNext()) {
-            iterator = playerTurns.iterator();
-        }
-        for (Player playerTurn : playerTurns) {
-            playerTurn.setFirstToPlay(false);
-        }
-        iterator.next().setFirstToPlay(true);
-    }
-
-    public Player setFirstPlayer(Player player) {
-        player.setFirstToPlay(true);
-        return player;
+        return newTurnList;
     }
 }
