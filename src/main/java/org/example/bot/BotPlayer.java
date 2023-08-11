@@ -56,8 +56,8 @@ public class BotPlayer extends Player {
 
         int handValueSum = this.getHand()
                 .stream()
-                .filter(it -> it.getSuit() == mostCountedSuit)
-                .mapToInt(it -> it.getValue().getValueCode())
+                .filter(it -> it.suit() == mostCountedSuit)
+                .mapToInt(it -> it.value().getValueCode())
                 .sum();
 
         // todo: Find a good threshold
@@ -68,7 +68,7 @@ public class BotPlayer extends Player {
         Map<Suit, Long> suitCount =
                 this.getHand()
                         .stream()
-                        .collect(Collectors.groupingBy(Card::getSuit, Collectors.counting()));
+                        .collect(Collectors.groupingBy(Card::suit, Collectors.counting()));
 
         long max = 0;
         Suit suit = null;

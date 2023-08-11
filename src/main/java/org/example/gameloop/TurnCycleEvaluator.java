@@ -16,16 +16,16 @@ public class TurnCycleEvaluator {
     public Player findMostValuableCardsOwner(Map<Player, Card> playerCardMap, Suit tramp, Suit firstCardsSuit) {
         if (isThereTramp(playerCardMap, tramp)) {
             Map.Entry<Player, Card> wantedPair = playerCardMap.entrySet().stream()
-                    .filter(card -> card.getValue().getSuit().equals(tramp))
-                    .max(Comparator.comparingInt(x -> x.getValue().getValue().getValueCode()))
+                    .filter(card -> card.getValue().suit().equals(tramp))
+                    .max(Comparator.comparingInt(x -> x.getValue().value().getValueCode()))
                     .get();
             System.out.println("winner is " + wantedPair.getKey().getName());
             wantedPair.getKey().setScore(wantedPair.getKey().getScore() + 1);
             return wantedPair.getKey();
         } else {
             Map.Entry<Player, Card> wantedPair = playerCardMap.entrySet().stream()
-                    .filter(card -> card.getValue().getSuit().equals(firstCardsSuit))
-                    .max(Comparator.comparingInt(x -> x.getValue().getValue().getValueCode()))
+                    .filter(card -> card.getValue().suit().equals(firstCardsSuit))
+                    .max(Comparator.comparingInt(x -> x.getValue().value().getValueCode()))
                     .get();
             System.out.println("winner is" + wantedPair.getKey().getName());
             wantedPair.getKey().setScore(wantedPair.getKey().getScore() + 1);
@@ -35,7 +35,7 @@ public class TurnCycleEvaluator {
 
     private boolean isThereTramp(Map<Player, Card> cards, Suit tramp) {
         return cards.values().stream()
-                .filter(it -> it.getSuit().equals(tramp))
+                .filter(it -> it.suit().equals(tramp))
                 .toList()
                 .size() > 0;
     }

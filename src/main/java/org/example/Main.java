@@ -14,7 +14,6 @@ public class Main {
 
 
     }
-
     private static GameManager initializeGamePlay() {
         Scanner scanner = new Scanner(System.in);
         HumanPlayer humanPlayer = new HumanPlayer(scanner, "HUMAN");

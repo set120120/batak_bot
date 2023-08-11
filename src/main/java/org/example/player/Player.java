@@ -34,11 +34,11 @@ public abstract class Player {
 
     public List<Card> groupCardsInHand() {
         Map<String, List<Card>> groupedAndSorted = this.getHand().stream()
-                .collect(Collectors.groupingBy(card -> card.getSuit().getSuitName(),
+                .collect(Collectors.groupingBy(card -> card.suit().getSuitName(),
                         Collectors.collectingAndThen(
                                 Collectors.toList(),
                                 cards -> cards.stream()
-                                        .sorted(Comparator.comparingInt(card -> -card.getValue().getValueCode()))  // Ters sıralama
+                                        .sorted(Comparator.comparingInt(card -> -card.value().getValueCode()))  // Ters sıralama
                                         .collect(Collectors.toList()))));
 
         List<Card> result = new ArrayList<>();  // Create a modifiable list
