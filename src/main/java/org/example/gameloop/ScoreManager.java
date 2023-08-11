@@ -8,11 +8,11 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Scoreboard {
+public class ScoreManager {
 
     private final Map<Player, Integer> scores;
 
-    public Scoreboard(HumanPlayer human, BotPlayer bot1, BotPlayer bot2, BotPlayer bot3) {
+    public ScoreManager(HumanPlayer human, BotPlayer bot1, BotPlayer bot2, BotPlayer bot3) {
         this.scores = new HashMap<>();
         this.scores.put(human, 0);
         this.scores.put(bot1, 0);
@@ -20,15 +20,15 @@ public class Scoreboard {
         this.scores.put(bot3, 0);
     }
 
-    public void addScore(Player player, int score) {
-        scores.put(player, scores.getOrDefault(player, 0) + score);
+    public void incrementPlayerScore(Player player) {
+        scores.put(player, scores.getOrDefault(player, 0) + 1);
     }
 
-    public int getScore(Player player) {
+    public int getPlayerScore(Player player) {
         return scores.getOrDefault(player, 0);
     }
 
-    public Map<Player, Integer> getScores() {
+    public Map<Player, Integer> getAllScores() {
         return Collections.unmodifiableMap(scores);
     }
 

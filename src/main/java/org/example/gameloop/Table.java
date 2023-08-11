@@ -2,12 +2,12 @@ package org.example.gameloop;
 
 import org.example.player.Player;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class Table {
 
-    private Map<Player, Card> playedCardsInCurrentRound = new HashMap<>();
+    private final Map<Player, Card> playedCardsInCurrentRound = new LinkedHashMap<>();
 
     public Map<Player, Card> getPlayedCardsInCurrentRound() {
         return playedCardsInCurrentRound;
@@ -27,5 +27,12 @@ public class Table {
             System.out.print(card.toString() + ", ");
         }
         System.out.println(".");
+    }
+
+    public Card getFirstCardPlayed() {
+        return playedCardsInCurrentRound.entrySet()
+                .iterator()
+                .next()
+                .getValue();
     }
 }

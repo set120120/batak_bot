@@ -9,11 +9,9 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args) {
         GameManager gameManager = initializeGamePlay();
-
         gameManager.start();
-
-
     }
+
     private static GameManager initializeGamePlay() {
         Scanner scanner = new Scanner(System.in);
         HumanPlayer humanPlayer = new HumanPlayer(scanner, "HUMAN");
@@ -26,10 +24,10 @@ public class Main {
         bot3.setNext(humanPlayer);
         Dealer dealer = new Dealer(new Deck());
         Table table = new Table();
-        Scoreboard scoreboard = new Scoreboard(humanPlayer, bot1, bot2, bot3);
-        TurnCycleEvaluator turnCycleEvaluator = new TurnCycleEvaluator();
+        ScoreManager scoreManager = new ScoreManager(humanPlayer, bot1, bot2, bot3);
+        TurnCycleEvaluator turnCycleEvaluator = new TurnCycleEvaluator(scoreManager);
         TurnManager turnManager = new TurnManager(turnCycleEvaluator);
         BidManager bidManager = new BidManager();
-        return new GameManager(humanPlayer, bot1, bot2, bot3, dealer, table, scoreboard, scanner, turnManager, turnCycleEvaluator, bidManager);
+        return new GameManager(humanPlayer, bot1, bot2, bot3, dealer, table, scanner, turnManager, turnCycleEvaluator, bidManager);
     }
 }

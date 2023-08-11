@@ -8,19 +8,22 @@ import java.util.Map;
 
 public class TurnCycleEvaluator {
 
-//    public Player determineTurnWinner(Player player, Map<Player,Card> playerCardMap, Suit tramp, Suit firstCardsSuit) {
-//        player = findMostValuableCardsOwner(playerCardMap, tramp, firstCardsSuit);
-//        return player;
-//    }
+    private final ScoreManager scoreManager;
 
-    public Player findMostValuableCardsOwner(Map<Player, Card> playerCardMap, Suit tramp, Suit firstCardsSuit) {
+    public TurnCycleEvaluator(ScoreManager scoreManager) {
+        this.scoreManager = scoreManager;
+    }
+
+
+    public Player getTurnWinner(Map<Player, Card> playerCardMap, Suit tramp, Suit firstCardsSuit) {
         if (isThereTramp(playerCardMap, tramp)) {
             Map.Entry<Player, Card> wantedPair = playerCardMap.entrySet().stream()
                     .filter(card -> card.getValue().suit().equals(tramp))
                     .max(Comparator.comparingInt(x -> x.getValue().value().getValueCode()))
                     .get();
+
             System.out.println("winner is " + wantedPair.getKey().getName());
-            wantedPair.getKey().setScore(wantedPair.getKey().getScore() + 1);
+            scoreManager.incrementPlayerScore(wantedPair.getKey());
             return wantedPair.getKey();
         } else {
             Map.Entry<Player, Card> wantedPair = playerCardMap.entrySet().stream()
@@ -28,15 +31,14 @@ public class TurnCycleEvaluator {
                     .max(Comparator.comparingInt(x -> x.getValue().value().getValueCode()))
                     .get();
             System.out.println("winner is" + wantedPair.getKey().getName());
-            wantedPair.getKey().setScore(wantedPair.getKey().getScore() + 1);
+            scoreManager.incrementPlayerScore(wantedPair.getKey());
             return wantedPair.getKey();
         }
     }
 
     private boolean isThereTramp(Map<Player, Card> cards, Suit tramp) {
-        return cards.values().stream()
+        return !cards.values().stream()
                 .filter(it -> it.suit().equals(tramp))
-                .toList()
-                .size() > 0;
+                .toList().isEmpty();
     }
 }

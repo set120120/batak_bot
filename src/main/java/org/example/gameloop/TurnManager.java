@@ -28,4 +28,8 @@ public class TurnManager {
 
         return newTurnList;
     }
+
+    public Player getNextPlayer(Player player) {
+        return player.getNext();
+    }
 }
