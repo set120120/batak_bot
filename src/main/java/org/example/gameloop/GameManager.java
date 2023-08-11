@@ -88,7 +88,7 @@ public class GameManager {
     public void oneGameCycle() {
         System.out.println(player.getName() + " is playing ");
         Card selectedCard = player.playCard();
-        firstCardsSuit = selectedCard.getSuit();
+        firstCardsSuit = selectedCard.suit();
         cardsPlayedCycle.put(player, selectedCard);
         selectedCard = player.getNext().playCard();
         System.out.println(player.getNext().getName() + " is playing ");
