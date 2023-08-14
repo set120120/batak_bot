@@ -9,12 +9,9 @@ import java.util.stream.Collectors;
 public abstract class Player {
 
     private Player next;
-    private boolean isFirstToBid;
-
-    private boolean isFirstToPlay;
-    // todo: isFirstToBid isFirstToPlay olarak ayıralım
     protected String name;
     protected List<Card> hand;
+    private boolean isFirstToBid;
     protected int scoreInCurrentRound = 0;
 
     public Player getNext() {
@@ -25,9 +22,11 @@ public abstract class Player {
         this.next = next;
     }
 
+    public void setFirstToBid(boolean firstToBid) {
+        isFirstToBid = firstToBid;
+    }
+
     public Player() {
-        this.isFirstToBid = false;
-        this.isFirstToPlay = false;
         this.hand = new LinkedList<>();
         this.scoreInCurrentRound = 0;
     }
@@ -38,11 +37,11 @@ public abstract class Player {
                         Collectors.collectingAndThen(
                                 Collectors.toList(),
                                 cards -> cards.stream()
-                                        .sorted(Comparator.comparingInt(card -> -card.value().getValueCode()))  // Ters sıralama
+                                        .sorted(Comparator.comparingInt(card -> -card.value().getValueCode()))
                                         .collect(Collectors.toList()))));
 
-        List<Card> result = new ArrayList<>();  // Create a modifiable list
-        groupedAndSorted.values().forEach(result::addAll);  // Add the sorted cards to the result list
+        List<Card> result = new ArrayList<>();
+        groupedAndSorted.values().forEach(result::addAll);
         return result;
     }
     public boolean isHandEmpty() {
@@ -56,12 +55,6 @@ public abstract class Player {
     public String getName() {
         return name;
     }
-
-
-    public void setFirstToBid(boolean isFirstToBid) {
-        this.isFirstToBid = isFirstToBid;
-    }
-
     public void setName(String name) {
         this.name = name;
     }

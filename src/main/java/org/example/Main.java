@@ -14,10 +14,11 @@ public class Main {
 
     private static GameManager initializeGamePlay() {
         Scanner scanner = new Scanner(System.in);
+        BidConfigManager bidConfigManager = new BidConfigManager();
         HumanPlayer humanPlayer = new HumanPlayer(scanner, "HUMAN");
-        BotPlayer bot1 = new BotPlayer("Bot1");
-        BotPlayer bot2 = new BotPlayer("Bot2");
-        BotPlayer bot3 = new BotPlayer("Bot3");
+        BotPlayer bot1 = new BotPlayer("Bot1", bidConfigManager);
+        BotPlayer bot2 = new BotPlayer("Bot2", bidConfigManager);
+        BotPlayer bot3 = new BotPlayer("Bot3", bidConfigManager);
         humanPlayer.setNext(bot1);
         bot1.setNext(bot2);
         bot2.setNext(bot3);

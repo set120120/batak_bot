@@ -13,8 +13,10 @@ public class BidManager {
 
     public Player determineTheBidWinner(Player player) {
         Map<Player, Integer> allBids = takeAllBids(player);
+        System.out.println(allBids);
         Map.Entry<Player, Integer> playerWhoBidMax = allBids.entrySet().stream().max(Map.Entry.comparingByValue())
                 .orElseThrow(() -> new RuntimeException("No max bid found"));
+        System.out.println(allBids);
         System.out.println("Bid winner is " + playerWhoBidMax.getKey().getName());
         return playerWhoBidMax.getKey();
     }

@@ -57,7 +57,7 @@ public class HumanPlayer extends Player {
     }
 
     private Card getPlayerInput() {
-        //logHand();
+        logHand();
 
         System.out.println("Enter the number corresponding to the card you want to play:");
         int cardIndex = scanner.nextInt() - 1;
