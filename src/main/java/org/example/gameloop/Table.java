@@ -22,11 +22,7 @@ public class Table {
     }
 
     public void displayCurrentTable() {
-        System.out.println("Current Cards on table: ");
-        for (Card card : playedCardsInCurrentRound.values()) {
-            System.out.print(card.toString() + ", ");
-        }
-        System.out.println(".");
+        System.out.println("Current Cards on table: " + playedCardsInCurrentRound.values());
     }
 
     public Card getFirstCardPlayed() {

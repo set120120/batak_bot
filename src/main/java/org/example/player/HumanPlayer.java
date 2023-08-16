@@ -44,11 +44,10 @@ public class HumanPlayer extends Player {
     }
 
     @Override
-    public int makeBid() {
+    public int makeBid(int currentMaxBid) {
         System.out.println("Enter the number to make bid.");
-
-        return scanner.nextInt();
-
+        int bid = scanner.nextInt();
+        return bid > currentMaxBid ? bid : 0;
     }
 
     @Override

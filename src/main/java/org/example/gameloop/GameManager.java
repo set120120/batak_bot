@@ -81,15 +81,19 @@ public class GameManager {
         System.out.println(playerWhoGoesFirst.getName() + " is playing ");
         Card selectedCard = playerWhoGoesFirst.playCard();
         table.addCardCurrentRound(playerWhoGoesFirst, selectedCard);
+        table.displayCurrentTable();
+
 
         Player secondPlayer = turnManager.getNextPlayer(playerWhoGoesFirst);
         System.out.println(secondPlayer.getName() + " is playing ");
         table.addCardCurrentRound(secondPlayer, secondPlayer.playCard());
+        table.displayCurrentTable();
 
         Player thirdPlayer = turnManager.getNextPlayer(secondPlayer);
         System.out.println(thirdPlayer.getName() + " is playing ");
         selectedCard = playerWhoGoesFirst.getNext().getNext().playCard();
         table.addCardCurrentRound(thirdPlayer, selectedCard);
+        table.displayCurrentTable();
 
         Player lastPlayer = turnManager.getNextPlayer(thirdPlayer);
         System.out.println(lastPlayer.getName() + " is playing");

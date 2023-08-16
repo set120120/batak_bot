@@ -77,7 +77,7 @@ public abstract class Player {
 
     public abstract Card playCard();
 
-    public abstract int makeBid();
+    public abstract int makeBid(int currentMaxBid);
 
 
     @Override

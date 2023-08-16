@@ -3,13 +3,18 @@ package org.example.gameloop;
 import org.example.enums.Suit;
 import org.example.player.Player;
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
 public class BidManager {
 
-    public BidManager() {
+    private final TurnManager turnManager;
+
+    public BidManager(TurnManager turnManager) {
+        this.turnManager = turnManager;
     }
+
 
     public Player determineTheBidWinner(Player player) {
         Map<Player, Integer> allBids = takeAllBids(player);
@@ -26,13 +31,31 @@ public class BidManager {
     }
 
 
-    private Map<Player, Integer> takeAllBids(Player player) {
+    private Map<Player, Integer> takeAllBids(Player currentPlayer) {
         Map<Player, Integer> bidsByPlayers = new HashMap<>();
-        bidsByPlayers.put(player, player.makeBid());
-        bidsByPlayers.put(player.getNext(), player.getNext().makeBid());
-        bidsByPlayers.put(player.getNext().getNext(), player.getNext().getNext().makeBid());
-        bidsByPlayers.put(player.getNext().getNext().getNext(), player.getNext().getNext().getNext().makeBid());
+
+        int currentMaxBid = currentPlayer.makeBid(-1);
+        bidsByPlayers.put(currentPlayer, currentMaxBid);
+
+        Player secondPlayer = turnManager.getNextPlayer(currentPlayer);
+
+        bidsByPlayers.put(secondPlayer, secondPlayer.makeBid(currentMaxBid));
+        currentMaxBid = getCurrentMaxBid(bidsByPlayers);
+
+        Player thirdPlayer = turnManager.getNextPlayer(secondPlayer);
+
+        bidsByPlayers.put(thirdPlayer, thirdPlayer.makeBid(currentMaxBid));
+        currentMaxBid = getCurrentMaxBid(bidsByPlayers);
+
+        Player fourthPlayer = turnManager.getNextPlayer(thirdPlayer);
+
+        bidsByPlayers.put(fourthPlayer, fourthPlayer.makeBid(currentMaxBid));
         return bidsByPlayers;
     }
-
+    private int getCurrentMaxBid(Map<Player, Integer> bidsByPlayers){
+        return bidsByPlayers.values().stream()
+                .sorted(Comparator.comparingInt(card -> -card))
+                .toList()
+                .get(0);
+    }
 }

@@ -6,10 +6,10 @@ import org.example.gameloop.Card;
 import org.example.model.BidConfig;
 import org.example.player.Player;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.example.enums.Value.*;
@@ -43,25 +43,29 @@ public class BotPlayer extends Player {
 
     @Override
     public Suit selectTramp() {
-        return null;
+        Suit mostCountedSuit = findMostCountedSuit();
+        System.out.println("Selected Tramp is: " + mostCountedSuit);
+        return mostCountedSuit;
     }
 
     @Override
-    public int makeBid() {
-        // todo: cannot bid equal or less than current bid if there's any
-        return shouldBid();
+    public int makeBid(int currentMaxBid) {
+        int bid = determineBidCount();
+        System.out.println(this.getName() + " is bidding :" + determineBidCount());
+        return bid > currentMaxBid ? bid : 0;
     }
 
-    private Optional<Integer> determineBid() {
-        if (shouldBid() == 5) {
-            // todo: write the algo for the bid value
-            return Optional.of(6);
-        } else {
-            return Optional.empty();
-        }
-    }
 
-    private int shouldBid() {
+//    private Optional<Integer> determineBid() {
+//        if (shouldBid() == 5) {
+//            return Optional.of(6);
+//        } else {
+//            return Optional.empty();
+//        }
+//    }
+
+
+    private int determineBidCount() {
         Suit mostCountedSuit = findMostCountedSuit();
         int trampCount = getTrampCount(mostCountedSuit);
         int pointsFromNonTrampSuits = pointsFromNonTrampSuits(this.getHand(), mostCountedSuit);
@@ -97,7 +101,7 @@ public class BotPlayer extends Player {
                     .orElseThrow(() -> new RuntimeException("No range is defined for trampCount " + trampCount + "" +
                             "and averageOfTramps: " + averageOfTramp + "and pointsFromNonTrampSuits: " + pointsFromNonTrampSuits));
         } else {
-            if (isThereAce(this.getHand())){
+            if (isThereAce(this.getHand())) {
                 return trampCount;
             } else {
                 return trampCount - 1;
@@ -112,13 +116,47 @@ public class BotPlayer extends Player {
                 .size();
     }
 
+    private float increaseAverageOfTramp(List<Card> cards, Suit tramp) {
+        List<Card> tramps = cards.stream()
+                .filter(card -> card.suit() == tramp)
+                .toList();
+        boolean isAceFound = false;
+        boolean isKingFound = false;
+        float increaseAmount = 0F;
+        for (Card card : tramps) {
+            if (card.value().getValueCode() == ACE.getValueCode()) {
+                increaseAmount += 0.30F;
+                isAceFound = true;
+            } else if (card.value().getValueCode() == KING.getValueCode()) {
+                increaseAmount += 0.15F;
+                isKingFound = true;
+                if (isAceFound) {
+                    increaseAmount += 0.15F;
+                }
+            } else if (card.value().getValueCode() == QUEEN.getValueCode()) {
+                increaseAmount += 0.10F;
+                if (isAceFound) {
+                    increaseAmount += 0.10F;
+                }
+                if (isKingFound) {
+                    increaseAmount += 0.05F;
+                    if (isAceFound) {
+                        increaseAmount += 0.20F;
+                    }
+                }
+
+            }
+        }
+
+        return increaseAmount;
+    }
 
     private float averageOfTramp(List<Card> cards, Suit tramp, int countOfTramp) {
         int sumOfValues = cards.stream()
                 .filter(x -> x.suit() == tramp)
                 .mapToInt(x -> x.value().getValueCode())
                 .sum();
-        return (float) sumOfValues / countOfTramp;
+        return ((float) sumOfValues / countOfTramp) + increaseAverageOfTramp(cards, tramp);
     }
 
     // 5
@@ -170,21 +208,15 @@ public class BotPlayer extends Player {
     }
 
     private Suit findMostCountedSuit() {
-        Map<Suit, Long> suitCount =
-                this.getHand()
-                        .stream()
-                        .collect(Collectors.groupingBy(Card::suit, Collectors.counting()));
-
-        long max = 0;
-        Suit suit = null;
-        for (Map.Entry<Suit, Long> entry : suitCount.entrySet()) {
-            if (entry.getValue() > max) {
-                max = entry.getValue();
-                suit = entry.getKey();
-            }
-        }
-        return suit;
+        return this.getHand().stream()
+                .collect(Collectors.groupingBy(Card::suit, Collectors.counting()))
+                .entrySet()
+                .stream()
+                .max(Comparator.comparingLong(Map.Entry::getValue))
+                .get()
+                .getKey();
     }
+
     private boolean isThereAce(List<Card> cards) {
         return cards.stream()
                 .filter(card -> card.value() == ACE)

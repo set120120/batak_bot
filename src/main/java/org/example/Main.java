@@ -28,7 +28,7 @@ public class Main {
         ScoreManager scoreManager = new ScoreManager(humanPlayer, bot1, bot2, bot3);
         TurnCycleEvaluator turnCycleEvaluator = new TurnCycleEvaluator(scoreManager);
         TurnManager turnManager = new TurnManager(turnCycleEvaluator);
-        BidManager bidManager = new BidManager();
+        BidManager bidManager = new BidManager(turnManager);
         return new GameManager(humanPlayer, bot1, bot2, bot3, dealer, table, scanner, turnManager, turnCycleEvaluator, bidManager);
     }
 }
