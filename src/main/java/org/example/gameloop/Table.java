@@ -1,9 +1,9 @@
 package org.example.gameloop;
 
+import org.example.enums.Suit;
 import org.example.player.Player;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 public class Table {
 
@@ -12,6 +12,12 @@ public class Table {
     public Map<Player, Card> getPlayedCardsInCurrentRound() {
         return playedCardsInCurrentRound;
     }
+
+    public Optional<Card> getFirstCardOnTable() {
+        List<Card> values = playedCardsInCurrentRound.values().stream().toList();
+        return this.playedCardsInCurrentRound.isEmpty() ? Optional.empty() : Optional.of(values.get(0));
+    }
+
 
     public void clearCurrentTable() {
         playedCardsInCurrentRound.clear();
@@ -30,5 +36,13 @@ public class Table {
                 .iterator()
                 .next()
                 .getValue();
+    }
+
+    public boolean isThereAnyTrampOnTable(Suit tramp) {
+        return !this.playedCardsInCurrentRound.values()
+                .stream()
+                .filter(card -> card.suit() == tramp)
+                .toList()
+                .isEmpty();
     }
 }

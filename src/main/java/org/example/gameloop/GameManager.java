@@ -39,7 +39,7 @@ public class GameManager {
         Player firstPlayer = bidManager.determineTheBidWinner(firstPlayerToBid);
         Suit selectedTramp = firstPlayer.selectTramp();
         for (int i = 0; i < 13; i++) {
-            gameTurn(firstPlayer);
+            gameTurn(firstPlayer, selectedTramp);
             firstPlayer = turnCycleEvaluator.getTurnWinner(table.getPlayedCardsInCurrentRound(), selectedTramp, table.getFirstCardPlayed().suit());
             table.clearCurrentTable();
         }
@@ -77,27 +77,28 @@ public class GameManager {
         }
     }
 
-    public void gameTurn(Player playerWhoGoesFirst) {
+    public void gameTurn(Player playerWhoGoesFirst, Suit tramp) {
         System.out.println(playerWhoGoesFirst.getName() + " is playing ");
-        Card selectedCard = playerWhoGoesFirst.playCard();
+
+        Card selectedCard = playerWhoGoesFirst.playCard(tramp);
         table.addCardCurrentRound(playerWhoGoesFirst, selectedCard);
         table.displayCurrentTable();
 
 
         Player secondPlayer = turnManager.getNextPlayer(playerWhoGoesFirst);
         System.out.println(secondPlayer.getName() + " is playing ");
-        table.addCardCurrentRound(secondPlayer, secondPlayer.playCard());
+        table.addCardCurrentRound(secondPlayer, secondPlayer.playCard(tramp));
         table.displayCurrentTable();
 
         Player thirdPlayer = turnManager.getNextPlayer(secondPlayer);
         System.out.println(thirdPlayer.getName() + " is playing ");
-        selectedCard = playerWhoGoesFirst.getNext().getNext().playCard();
+        selectedCard = playerWhoGoesFirst.getNext().getNext().playCard(tramp);
         table.addCardCurrentRound(thirdPlayer, selectedCard);
         table.displayCurrentTable();
 
         Player lastPlayer = turnManager.getNextPlayer(thirdPlayer);
         System.out.println(lastPlayer.getName() + " is playing");
-        table.addCardCurrentRound(lastPlayer, lastPlayer.playCard());
+        table.addCardCurrentRound(lastPlayer, lastPlayer.playCard(tramp));
         table.displayCurrentTable();
     }
 }

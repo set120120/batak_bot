@@ -2,7 +2,7 @@ package org.example.enums;
 
 public enum Suit {
 
-    CLUBS(0, "CLUB"),
+    CLUBS(0, "CLUBS"),
     HEARTS(1, "HEARTS"),
     SPADES(2, "SPADES"),
     DIAMONDS(3, "DIAMONDS");

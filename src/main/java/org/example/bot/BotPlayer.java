@@ -3,6 +3,7 @@ package org.example.bot;
 import org.example.enums.Suit;
 import org.example.gameloop.BidConfigManager;
 import org.example.gameloop.Card;
+import org.example.gameloop.Table;
 import org.example.model.BidConfig;
 import org.example.player.Player;
 
@@ -16,12 +17,13 @@ import static org.example.enums.Value.*;
 
 public class BotPlayer extends Player {
 
-
     private final BidConfigManager bidConfigManager;
+    private final Table table;
 
-    public BotPlayer(String name, BidConfigManager bidConfigManager) {
+    public BotPlayer(String name, BidConfigManager bidConfigManager, Table table) {
         super();
         this.bidConfigManager = bidConfigManager;
+        this.table = table;
         this.name = name;
     }
 
@@ -33,13 +35,148 @@ public class BotPlayer extends Player {
         }
     }
 
-    @Override
-    public Card playCard() {
-        Card selectedCard = getHand().get(0);
-        getHand().remove(selectedCard);
-        logHand();
-        return selectedCard;
+     //Functions for gameplay.
+    private List<Card> sortCards(List<Card> cards) {
+        return cards.stream()
+                .sorted(Comparator.comparingInt(card -> card.value().getValueCode()))
+                .toList();
     }
+    private List<Card> filterForASpecificSuit(List<Card> cards, Suit suit) {
+        return cards.stream()
+                .filter(card -> card.suit() == suit)
+                .toList();
+    }
+    private List<Card> filterAndSortForSuit(List<Card> cards, Suit suit) {
+        return cards.stream()
+                .filter(card -> card.suit() == suit)
+                .sorted(Comparator.comparingInt(card -> card.value().getValueCode()))
+                .toList();
+    }
+
+    private List<Card> bigCards(List<Card> cards, Card maxCard) {
+        return cards.stream()
+                .filter(card -> card.value().getValueCode() > maxCard.value().getValueCode())
+                .toList();
+    }
+    private List<Card> sortedBigCards(List<Card> cards, Card maxCard) {
+        return cards.stream()
+                .filter(card -> card.value().getValueCode() > maxCard.value().getValueCode())
+                .sorted(Comparator.comparingInt(card -> card.value().getValueCode()))
+                .toList();
+    }
+    @Override
+    public Card playCard(Suit tramp) {
+        if (table.getPlayedCardsInCurrentRound().isEmpty()) { // if there is no card on table play first card
+            Card selectedCard = getHand().get(0);
+            getHand().remove(selectedCard);
+            logHand();
+            return selectedCard;
+        }
+        int indexOfCurrentPlayer = table.getPlayedCardsInCurrentRound().size();
+
+        Card topCard = table.getFirstCardOnTable().get();
+
+        boolean isThereFirstSuit = true;
+
+        List<Card> cardsCanPlayed = filterForASpecificSuit(this.getHand(), topCard.suit());
+
+        if (cardsCanPlayed.isEmpty()) {                        // if there is no any card you have to play with tramp
+            cardsCanPlayed = filterForASpecificSuit(this.getHand(), tramp);
+            isThereFirstSuit = false;
+        }
+        if (cardsCanPlayed.isEmpty()) { // if there is no tramp you have to play the lower card
+            Card selectedCard = this.getHand().stream()
+                    .min(Comparator.comparingInt(card -> card.value().getValueCode())).get();
+            getHand().remove(selectedCard);
+            logHand();
+            return selectedCard;
+        }
+
+        if (!table.isThereAnyTrampOnTable(tramp)) { // if no-one played with tramp that
+                                                    // means everyone played hearts while tramp is club
+            if (isThereFirstSuit) { // if I have first suit
+                Card maxCard = table.getPlayedCardsInCurrentRound().values().stream()
+                        .max(Comparator.comparingInt(card -> card.value().getValueCode()))
+                        .get();
+
+                List<Card> biggerCards = bigCards(cardsCanPlayed, maxCard);
+
+                if (biggerCards.isEmpty()) {
+                    Card selectedCard = sortCards(cardsCanPlayed).get(0);
+                    getHand().remove(selectedCard);
+                    logHand();
+                    return selectedCard;
+                }
+                if (indexOfCurrentPlayer != 3){
+                    Card selectedCard = biggerCards.get(0);
+                    getHand().remove(selectedCard);
+                    logHand();
+                    return selectedCard;
+                } else {
+                    Card selectedCard = biggerCards.stream()
+                            .min(Comparator.comparingInt(card -> card.value().getValueCode())).get();
+                    getHand().remove(selectedCard);
+                    logHand();
+                    return selectedCard;
+                }
+
+            } else {
+                Card selectedCard = cardsCanPlayed.stream()
+                        .min(Comparator.comparingInt(card-> card.value().getValueCode())).get();
+                getHand().remove(selectedCard);
+                logHand();
+                return selectedCard;
+            }
+
+
+        } else { // someone played tramp
+            if (isThereFirstSuit) {
+                if (topCard.suit() != tramp) { // if the first card's suit is not tramp I should play with low as much as possible
+                    Card selectedCard = sortCards(cardsCanPlayed).get(0);
+                    getHand().remove(selectedCard);
+                    logHand();
+                    return selectedCard;
+                }
+                else { // if the first card is tramp
+                    Card maxTrampPlayed = table.getPlayedCardsInCurrentRound().values().stream()
+                            .filter(card -> card.suit() == tramp)
+                            .max(Comparator.comparingInt(card -> card.value().getValueCode())).get();
+
+                    List<Card> biggerCards = sortedBigCards(cardsCanPlayed, maxTrampPlayed);
+
+                    if (!biggerCards.isEmpty()) {
+                        Card selectedCard = biggerCards.get(0);
+                        getHand().remove(selectedCard);
+                        logHand();
+                        return selectedCard;
+                    }
+                    Card selectedCard = sortCards(cardsCanPlayed).get(0);
+                    getHand().remove(selectedCard);
+                    logHand();
+                    return selectedCard;
+                }
+            }
+            List<Card> biggerCards = filterAndSortForSuit(cardsCanPlayed, tramp);
+            if (!biggerCards.isEmpty()) {
+                Card selectedCard = biggerCards.get(0);
+                getHand().remove(selectedCard);
+                logHand();
+                return selectedCard;
+            }
+            Card selectedCard = sortCards(cardsCanPlayed).get(0);
+            getHand().remove(selectedCard);
+            logHand();
+            return selectedCard;
+        }
+    }
+
+    private boolean isThereCardWithCurrentSuit(Suit suit) {
+        return this.getHand().stream()
+                .filter(it -> it.suit() == suit)
+                .toList().isEmpty();
+    }
+
+    // Functions for bidding.
 
     @Override
     public Suit selectTramp() {
@@ -54,16 +191,6 @@ public class BotPlayer extends Player {
         System.out.println(this.getName() + " is bidding :" + determineBidCount());
         return bid > currentMaxBid ? bid : 0;
     }
-
-
-//    private Optional<Integer> determineBid() {
-//        if (shouldBid() == 5) {
-//            return Optional.of(6);
-//        } else {
-//            return Optional.empty();
-//        }
-//    }
-
 
     private int determineBidCount() {
         Suit mostCountedSuit = findMostCountedSuit();

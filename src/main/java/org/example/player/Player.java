@@ -75,7 +75,7 @@ public abstract class Player {
 
     public abstract void logHand();
 
-    public abstract Card playCard();
+    public abstract Card playCard(Suit tramp);
 
     public abstract int makeBid(int currentMaxBid);
 

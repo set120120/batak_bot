@@ -1,6 +1,5 @@
 package org.example.gameloop;
 
-import org.example.enums.Suit;
 import org.example.player.Player;
 
 import java.util.Comparator;
@@ -22,19 +21,20 @@ public class BidManager {
         Map.Entry<Player, Integer> playerWhoBidMax = allBids.entrySet().stream().max(Map.Entry.comparingByValue())
                 .orElseThrow(() -> new RuntimeException("No max bid found"));
         System.out.println(allBids);
+
+        if (playerWhoBidMax.getValue() == 0) {
+            System.out.println("No one make bid. Therefore, the bid went to " + player.getName() + ".");
+            return player;
+        }
         System.out.println("Bid winner is " + playerWhoBidMax.getKey().getName());
         return playerWhoBidMax.getKey();
-    }
-
-    public Suit selectGameTramp(Player player) {
-        return player.selectTramp();
     }
 
 
     private Map<Player, Integer> takeAllBids(Player currentPlayer) {
         Map<Player, Integer> bidsByPlayers = new HashMap<>();
 
-        int currentMaxBid = currentPlayer.makeBid(-1);
+        int currentMaxBid = currentPlayer.makeBid(4);
         bidsByPlayers.put(currentPlayer, currentMaxBid);
 
         Player secondPlayer = turnManager.getNextPlayer(currentPlayer);
@@ -52,7 +52,8 @@ public class BidManager {
         bidsByPlayers.put(fourthPlayer, fourthPlayer.makeBid(currentMaxBid));
         return bidsByPlayers;
     }
-    private int getCurrentMaxBid(Map<Player, Integer> bidsByPlayers){
+
+    private int getCurrentMaxBid(Map<Player, Integer> bidsByPlayers) {
         return bidsByPlayers.values().stream()
                 .sorted(Comparator.comparingInt(card -> -card))
                 .toList()
