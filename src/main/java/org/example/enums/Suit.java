@@ -16,6 +16,15 @@ public enum Suit {
         this.suitName = suitName;
     }
 
+    public Suit getSuit(int suitCode) {
+        return switch (suitCode) {
+            case 0 -> CLUBS;
+            case 1 -> HEARTS;
+            case 2 -> SPADES;
+            case 3 -> DIAMONDS;
+            default -> throw new IllegalArgumentException("Invalid suitCode: " + suitCode);
+        };
+    }
     public int getSuitCode() {
         return this.suitCode;
     }

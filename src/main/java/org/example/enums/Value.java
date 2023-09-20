@@ -15,7 +15,7 @@ public enum Value {
     KING(13, "KING"),
     ACE(14, "ACE");
 
-    private final int valueCode;
+    private final Integer valueCode;
     private final String valueName;
 
     Value(int valueCode, String valueName) {
@@ -23,7 +23,7 @@ public enum Value {
         this.valueName = valueName;
     }
 
-    public int getValueCode() {
+    public Integer getValueCode() {
         return this.valueCode;
     }
 

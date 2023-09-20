@@ -10,7 +10,6 @@ public class HumanPlayer extends Player {
     private final Scanner scanner;
 
     public HumanPlayer(Scanner scanner, String name) {
-        super();
         this.scanner = scanner;
         this.name = name;
     }
@@ -65,6 +64,7 @@ public class HumanPlayer extends Player {
     @Override
     public int makeBid(int currentMaxBid) {
         System.out.println("Enter the number to make bid.");
+        System.out.println(getHand());
         int bid = scanner.nextInt();
         while (bid == currentMaxBid && bid != 0) {
             System.out.println("You cannot make a bid is equal to current max bid. " +

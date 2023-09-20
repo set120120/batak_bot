@@ -2,9 +2,11 @@ package org.example.gameloop;
 
 import org.example.bot.BotPlayer;
 import org.example.enums.Suit;
+import org.example.model.BotTurnMemory;
 import org.example.player.HumanPlayer;
 import org.example.player.Player;
 
+import java.util.List;
 import java.util.Scanner;
 
 public class GameManager {
@@ -38,8 +40,8 @@ public class GameManager {
         dealer.dealCardsToPlayer(humanPlayer, bot1, bot2, bot3);
         Player firstPlayer = bidManager.determineTheBidWinner(firstPlayerToBid);
         Suit selectedTramp = firstPlayer.selectTramp();
-        for (int i = 0; i < 13; i++) {
-            gameTurn(firstPlayer, selectedTramp);
+        for (int turnSequence = 0; turnSequence < 13; turnSequence++) {
+            gameTurn(firstPlayer, selectedTramp, turnSequence + 1);
             firstPlayer = turnCycleEvaluator.getTurnWinner(table.getPlayedCardsInCurrentRound(), selectedTramp, table.getFirstCardPlayed().suit());
             table.clearCurrentTable();
         }
@@ -77,28 +79,43 @@ public class GameManager {
         }
     }
 
-    public void gameTurn(Player playerWhoGoesFirst, Suit tramp) {
-        System.out.println(playerWhoGoesFirst.getName() + " is playing ");
+    public void gameTurn(Player playerWhoGoesFirst, Suit tramp, int turnSequence) {
 
-        Card selectedCard = playerWhoGoesFirst.playCard(tramp);
-        table.addCardCurrentRound(playerWhoGoesFirst, selectedCard);
+        Card firstPlayerCard = playerWhoGoesFirst.playCard(tramp);
+        table.addCardCurrentRound(playerWhoGoesFirst, firstPlayerCard);
         table.displayCurrentTable();
 
+        BotTurnMemory first = new BotTurnMemory(playerWhoGoesFirst, firstPlayerCard);
 
         Player secondPlayer = turnManager.getNextPlayer(playerWhoGoesFirst);
-        System.out.println(secondPlayer.getName() + " is playing ");
-        table.addCardCurrentRound(secondPlayer, secondPlayer.playCard(tramp));
+        Card secondPlayerCard = secondPlayer.playCard(tramp);
+        table.addCardCurrentRound(secondPlayer, secondPlayerCard);
         table.displayCurrentTable();
+
+        BotTurnMemory second = new BotTurnMemory(secondPlayer, secondPlayerCard);
+
 
         Player thirdPlayer = turnManager.getNextPlayer(secondPlayer);
-        System.out.println(thirdPlayer.getName() + " is playing ");
-        selectedCard = playerWhoGoesFirst.getNext().getNext().playCard(tramp);
-        table.addCardCurrentRound(thirdPlayer, selectedCard);
+        Card thirdPlayerCard = thirdPlayer.playCard(tramp);
+        table.addCardCurrentRound(thirdPlayer, thirdPlayerCard);
         table.displayCurrentTable();
 
+        BotTurnMemory third = new BotTurnMemory(thirdPlayer, thirdPlayerCard);
+
+
         Player lastPlayer = turnManager.getNextPlayer(thirdPlayer);
-        System.out.println(lastPlayer.getName() + " is playing");
-        table.addCardCurrentRound(lastPlayer, lastPlayer.playCard(tramp));
+        Card lastPlayerCard = lastPlayer.playCard(tramp);
+        table.addCardCurrentRound(lastPlayer, lastPlayerCard);
         table.displayCurrentTable();
+
+        BotTurnMemory last = new BotTurnMemory(lastPlayer, lastPlayerCard);
+
+        List<BotTurnMemory> cards = List.of(first,second,third,last);
+        bot1.addCardToMemory(turnSequence, cards);
+        bot2.addCardToMemory(turnSequence, cards);
+        bot3.addCardToMemory(turnSequence, cards);
+
+        System.out.println("bot 3 memory is: " + bot3.getTurnMemory());
+
     }
 }

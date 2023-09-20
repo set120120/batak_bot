@@ -5,12 +5,10 @@ import org.example.gameloop.BidConfigManager;
 import org.example.gameloop.Card;
 import org.example.gameloop.Table;
 import org.example.model.BidConfig;
+import org.example.model.BotTurnMemory;
 import org.example.player.Player;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.example.enums.Value.*;
@@ -19,12 +17,15 @@ public class BotPlayer extends Player {
 
     private final BidConfigManager bidConfigManager;
     private final Table table;
+    private final Map<Integer, List<BotTurnMemory>> turnMemory;
+    //private final CardProbabilityManager cardProbabilityManager;
 
     public BotPlayer(String name, BidConfigManager bidConfigManager, Table table) {
-        super();
         this.bidConfigManager = bidConfigManager;
         this.table = table;
+        //this.cardProbabilityManager = cardProbabilityManager;
         this.name = name;
+        this.turnMemory = new HashMap<>();
     }
 
     @Override
@@ -35,17 +36,31 @@ public class BotPlayer extends Player {
         }
     }
 
-     //Functions for gameplay.
+    public void addCardToMemory(Integer turnSequence, List<BotTurnMemory> cards) {
+        turnMemory.put(turnSequence, cards);
+    }
+//    public void rememberPlayedCards(Collections botTurnMemoryCollections) {
+//        this.turnMemory.putAll(botTurnMemoryCollections);
+//    }
+
+    public void logMemory() {
+        System.out.println(this.turnMemory);
+    }
+
+
+    //Functions for gameplay.
     private List<Card> sortCards(List<Card> cards) {
         return cards.stream()
                 .sorted(Comparator.comparingInt(card -> card.value().getValueCode()))
                 .toList();
     }
+
     private List<Card> filterForASpecificSuit(List<Card> cards, Suit suit) {
         return cards.stream()
                 .filter(card -> card.suit() == suit)
                 .toList();
     }
+
     private List<Card> filterAndSortForSuit(List<Card> cards, Suit suit) {
         return cards.stream()
                 .filter(card -> card.suit() == suit)
@@ -58,18 +73,22 @@ public class BotPlayer extends Player {
                 .filter(card -> card.value().getValueCode() > maxCard.value().getValueCode())
                 .toList();
     }
+
     private List<Card> sortedBigCards(List<Card> cards, Card maxCard) {
         return cards.stream()
                 .filter(card -> card.value().getValueCode() > maxCard.value().getValueCode())
                 .sorted(Comparator.comparingInt(card -> card.value().getValueCode()))
                 .toList();
     }
+
     @Override
     public Card playCard(Suit tramp) {
+        logHand();
         if (table.getPlayedCardsInCurrentRound().isEmpty()) { // if there is no card on table play first card
             Card selectedCard = getHand().get(0);
             getHand().remove(selectedCard);
-            logHand();
+            table.deleteCardFromMap(selectedCard);
+            //cardProbabilityManager.updateOneCard(this, selectedCard);
             return selectedCard;
         }
         int indexOfCurrentPlayer = table.getPlayedCardsInCurrentRound().size();
@@ -88,12 +107,13 @@ public class BotPlayer extends Player {
             Card selectedCard = this.getHand().stream()
                     .min(Comparator.comparingInt(card -> card.value().getValueCode())).get();
             getHand().remove(selectedCard);
-            logHand();
+            table.deleteCardFromMap(selectedCard);
+            //cardProbabilityManager.updateOneCard(this, selectedCard);
             return selectedCard;
         }
 
         if (!table.isThereAnyTrampOnTable(tramp)) { // if no-one played with tramp that
-                                                    // means everyone played hearts while tramp is club
+            // means everyone played hearts while tramp is club
             if (isThereFirstSuit) { // if I have first suit
                 Card maxCard = table.getPlayedCardsInCurrentRound().values().stream()
                         .max(Comparator.comparingInt(card -> card.value().getValueCode()))
@@ -104,27 +124,28 @@ public class BotPlayer extends Player {
                 if (biggerCards.isEmpty()) {
                     Card selectedCard = sortCards(cardsCanPlayed).get(0);
                     getHand().remove(selectedCard);
-                    logHand();
+                    table.deleteCardFromMap(selectedCard);
                     return selectedCard;
                 }
-                if (indexOfCurrentPlayer != 3){
+                if (indexOfCurrentPlayer != 3) {
                     Card selectedCard = biggerCards.get(0);
                     getHand().remove(selectedCard);
-                    logHand();
+                    table.deleteCardFromMap(selectedCard);
                     return selectedCard;
                 } else {
                     Card selectedCard = biggerCards.stream()
                             .min(Comparator.comparingInt(card -> card.value().getValueCode())).get();
                     getHand().remove(selectedCard);
-                    logHand();
+                    ;
+                    table.deleteCardFromMap(selectedCard);
                     return selectedCard;
                 }
 
             } else {
                 Card selectedCard = cardsCanPlayed.stream()
-                        .min(Comparator.comparingInt(card-> card.value().getValueCode())).get();
+                        .min(Comparator.comparingInt(card -> card.value().getValueCode())).get();
                 getHand().remove(selectedCard);
-                logHand();
+                table.deleteCardFromMap(selectedCard);
                 return selectedCard;
             }
 
@@ -134,10 +155,9 @@ public class BotPlayer extends Player {
                 if (topCard.suit() != tramp) { // if the first card's suit is not tramp I should play with low as much as possible
                     Card selectedCard = sortCards(cardsCanPlayed).get(0);
                     getHand().remove(selectedCard);
-                    logHand();
+                    table.deleteCardFromMap(selectedCard);
                     return selectedCard;
-                }
-                else { // if the first card is tramp
+                } else { // if the first card is tramp
                     Card maxTrampPlayed = table.getPlayedCardsInCurrentRound().values().stream()
                             .filter(card -> card.suit() == tramp)
                             .max(Comparator.comparingInt(card -> card.value().getValueCode())).get();
@@ -147,12 +167,12 @@ public class BotPlayer extends Player {
                     if (!biggerCards.isEmpty()) {
                         Card selectedCard = biggerCards.get(0);
                         getHand().remove(selectedCard);
-                        logHand();
+                        table.deleteCardFromMap(selectedCard);
                         return selectedCard;
                     }
                     Card selectedCard = sortCards(cardsCanPlayed).get(0);
                     getHand().remove(selectedCard);
-                    logHand();
+                    table.deleteCardFromMap(selectedCard);
                     return selectedCard;
                 }
             }
@@ -160,21 +180,16 @@ public class BotPlayer extends Player {
             if (!biggerCards.isEmpty()) {
                 Card selectedCard = biggerCards.get(0);
                 getHand().remove(selectedCard);
-                logHand();
+                table.deleteCardFromMap(selectedCard);
                 return selectedCard;
             }
             Card selectedCard = sortCards(cardsCanPlayed).get(0);
             getHand().remove(selectedCard);
-            logHand();
+            table.deleteCardFromMap(selectedCard);
             return selectedCard;
         }
     }
 
-    private boolean isThereCardWithCurrentSuit(Suit suit) {
-        return this.getHand().stream()
-                .filter(it -> it.suit() == suit)
-                .toList().isEmpty();
-    }
 
     // Functions for bidding.
 
@@ -374,4 +389,9 @@ public class BotPlayer extends Player {
     public int hashCode() {
         return Objects.hash(getName());
     }
+
+    public Map<Integer, List<BotTurnMemory>> getTurnMemory() {
+        return turnMemory;
+    }
+
 }

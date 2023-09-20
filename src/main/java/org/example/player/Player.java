@@ -8,10 +8,10 @@ import java.util.stream.Collectors;
 
 public abstract class Player {
 
-    private Player next;
+    protected Player next;
     protected String name;
     protected List<Card> hand;
-    private boolean isFirstToBid;
+    protected boolean isFirstToBid;
     protected int scoreInCurrentRound = 0;
 
     public Player getNext() {
@@ -23,7 +23,7 @@ public abstract class Player {
     }
 
     public void setFirstToBid(boolean firstToBid) {
-        isFirstToBid = firstToBid;
+        this.isFirstToBid = firstToBid;
     }
 
     public Player() {
@@ -44,6 +44,7 @@ public abstract class Player {
         groupedAndSorted.values().forEach(result::addAll);
         return result;
     }
+
     public boolean isHandEmpty() {
         return hand.isEmpty();
     }
@@ -55,6 +56,7 @@ public abstract class Player {
     public String getName() {
         return name;
     }
+
     public void setName(String name) {
         this.name = name;
     }
